@@ -112,7 +112,7 @@ In the dockerized environment, there is one additional variable which may be set
 
 FLASK_ENV           | Result
 --------------------|--------
-production          | App is brought up using `uwsgi`. See/edit `uwsgi.ini` for details.
+production          | App is brought up using `uwsgi`. In this case, the environment variable `PORT` should also be set.
 development         | App is brought up with flask's built in http server.
 development-expose  | App is brought up with flask's built in http server and then exposed externally using `ngrok`. Use this environment to test twilio functionality.
 
