@@ -64,40 +64,17 @@ class USData(DataProvider):
 
         return legislators
 
-    def _load_districts(self):
-        """
-        Load US congressional district data from saved file
-        Returns a dictionary keyed by zipcode to cache for fast lookup
-
-        eg us:zipcode:94612 = [{'state':'CA', 'house_district': 13}]
-        or us:zipcode:54409 = [{'state':'WI', 'house_district': 7}, {'state':'WI', 'house_district': 8}]
-        """
-        districts = collections.defaultdict(list)
-
-        with open('call_server/political_data/data/us_districts.csv') as f:
-            reader = csv.DictReader(
-                f, fieldnames=['zipcode', 'state', 'house_district'])
-
-            for d in reader:
-                cache_key = self.KEY_ZIPCODE.format(**d)
-                districts[cache_key].append(d)
-
-        return districts
-
     def load_data(self):
-        districts = self._load_districts()
         legislators = self._load_legislators()
 
         if hasattr(self.cache, 'set_many'):
-            self.cache.set_many(districts)
             self.cache.set_many(legislators)
         elif hasattr(self.cache, 'update'):
             self.cache.update(legislators)
-            self.cache.update(districts)
         else:
             raise AttributeError('cache does not appear to be dict-like')
 
-        return len(districts) + len(legislators)
+        return len(legislators)
 
     # convenience methods for easy house, senate, district access
     def get_house_member(self, state, district):
@@ -107,9 +84,6 @@ class USData(DataProvider):
     def get_senators(self, state):
         key = self.KEY_SENATE.format(state=state)
         return self.cache.get(key) or []
-
-    def get_district(self, zipcode):
-        return self.cache.get(self.KEY_ZIPCODE.format(zipcode=zipcode)) or {}
 
     def get_bioguide(self, uid):
         return self.cache.get(self.KEY_BIOGUIDE.format(bioguide_id=uid)) or {}

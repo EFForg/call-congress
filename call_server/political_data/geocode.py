@@ -31,17 +31,7 @@ class Geocoder(object):
         self.client = GeocodioClient(API_KEY)
 
     def zipcode(self, zipcode, cache=None):
-        if cache:
-            districts = cache.get_district(zipcode)
-            if len(districts) == 1:
-                d = districts[0]
-                d['source'] = 'local district cache'
-                return Location(d)
-            else:
-                # TODO, how to handle districts that span states?
-                return self.geocode(zipcode)
-        else:
-            return self.geocode(zipcode)
+        return self.geocode(zipcode)
 
     def geocode(self, address):
         results = self.client.geocode(address).get('results')
