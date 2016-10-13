@@ -3,7 +3,7 @@
 
 def adapt_to_target(data, key_prefix):
     if key_prefix == "us:bioguide":
-        adapter = SunlightData()
+        adapter = UnitedStatesData()
         return adapter.adapt(data)
     elif key_prefix == "us_state:openstates":
         adapter = OpenStatesData()
@@ -16,14 +16,10 @@ def adapt_to_target(data, key_prefix):
     # TODO add for other countries
 
 
-class SunlightData(object):
+class UnitedStatesData(object):
     def adapt(self, data):
         mapped = {}
-        mapped['name'] = '{firstname} {lastname}'.format(**data)
-        if data['title'] == "Sen":
-            mapped['title'] = "Senator"
-        if data['title'] == "Rep":
-            mapped['title'] = "Representative"
+        mapped['name'] = '{first_name} {last_name}'.format(**data)
         mapped['number'] = data['phone']
         mapped['uid'] = data['bioguide_id']
 
