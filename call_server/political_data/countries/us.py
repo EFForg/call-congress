@@ -2,6 +2,10 @@ import csv
 import collections
 import random
 
+from datetime import datetime
+import httplib2
+import yaml
+
 from . import DataProvider
 
 from ...campaign.constants import (TARGET_CHAMBER_BOTH, TARGET_CHAMBER_UPPER, TARGET_CHAMBER_LOWER,
@@ -28,24 +32,35 @@ class USData(DataProvider):
         """
         legislators = collections.defaultdict(list)
 
-        with open('call_server/political_data/data/us_legislators.csv') as f:
-            reader = csv.DictReader(f)
+        http = httplib2.Http()
+        (_, content) = http.request("http://rawgit.com/unitedstates/congress-legislators/master/legislators-current.yaml")
 
-            for l in reader:
-                if l['in_office'] != '1':
-                    # skip if out of office
-                    continue
+        for info in yaml.load(content):
+            term = info["terms"][-1]
+            if term["start"] < "2011-01-01":
+                continue # don't get too historical
 
-                direct_key = self.KEY_BIOGUIDE.format(**l)
-                legislators[direct_key].append(l)
+            record = {
+                "first_name":  info["name"]["first"],
+                "last_name":   info["name"]["last"],
+                "bioguide_id": info["id"]["bioguide"],
+                "title":       "Sen" if term["type"] == "sen" else "Rep",
+                "phone":       term["phone"],
+                "current":     datetime.now().strftime("%Y-%m-%d") <= term["end"],
+                "chamber":     "senate" if term["type"] == "sen" else "house",
+                "state":       term["state"],
+                "district":    term.get("district", None),
+                "bioguide_id": info["id"]["bioguide"]
+            }
 
-                if l['senate_class']:
-                    l['chamber'] = 'senate'
-                    chamber_key = self.KEY_SENATE.format(**l)
-                else:
-                    l['chamber'] = 'house'
-                    chamber_key = self.KEY_HOUSE.format(**l)
-                legislators[chamber_key].append(l)
+            direct_key = self.KEY_BIOGUIDE.format(**record)
+            if record["chamber"] == "senate":
+                chamber_key = self.KEY_SENATE.format(**record)
+            else:
+                chamber_key = self.KEY_HOUSE.format(**record)
+
+            legislators[direct_key].append(record)
+            legislators[chamber_key].append(record)
 
         return legislators
 
