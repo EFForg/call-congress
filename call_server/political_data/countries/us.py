@@ -122,7 +122,7 @@ class USData(DataProvider):
     def get_uid(self, key):
         return self.cache.get(key) or {}
 
-    def locate_targets(self, zipcode, chambers=TARGET_CHAMBER_BOTH, order=ORDER_IN_ORDER):
+    def locate_targets(self, state, district, chambers=TARGET_CHAMBER_BOTH, order=ORDER_IN_ORDER):
         """ Find all congressional targets for a zipcode, crossing state boundaries if necessary.
         Returns a list of cached bioguide keys in specified order.
         """
