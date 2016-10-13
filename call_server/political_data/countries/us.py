@@ -3,7 +3,6 @@ import collections
 import random
 
 from datetime import datetime
-import httplib2
 import yaml
 
 from . import DataProvider
@@ -32,35 +31,33 @@ class USData(DataProvider):
         """
         legislators = collections.defaultdict(list)
 
-        http = httplib2.Http()
-        (_, content) = http.request("http://rawgit.com/unitedstates/congress-legislators/master/legislators-current.yaml")
+        with open('call_server/political_data/data/legislators-current.yaml') as f:
+            for info in yaml.load(f):
+                term = info["terms"][-1]
+                if term["start"] < "2011-01-01":
+                    continue # don't get too historical
 
-        for info in yaml.load(content):
-            term = info["terms"][-1]
-            if term["start"] < "2011-01-01":
-                continue # don't get too historical
+                record = {
+                    "first_name":  info["name"]["first"],
+                    "last_name":   info["name"]["last"],
+                    "bioguide_id": info["id"]["bioguide"],
+                    "title":       "Sen" if term["type"] == "sen" else "Rep",
+                    "phone":       term["phone"],
+                    "current":     datetime.now().strftime("%Y-%m-%d") <= term["end"],
+                    "chamber":     "senate" if term["type"] == "sen" else "house",
+                    "state":       term["state"],
+                    "district":    term.get("district", None),
+                    "bioguide_id": info["id"]["bioguide"]
+                }
 
-            record = {
-                "first_name":  info["name"]["first"],
-                "last_name":   info["name"]["last"],
-                "bioguide_id": info["id"]["bioguide"],
-                "title":       "Sen" if term["type"] == "sen" else "Rep",
-                "phone":       term["phone"],
-                "current":     datetime.now().strftime("%Y-%m-%d") <= term["end"],
-                "chamber":     "senate" if term["type"] == "sen" else "house",
-                "state":       term["state"],
-                "district":    term.get("district", None),
-                "bioguide_id": info["id"]["bioguide"]
-            }
+                direct_key = self.KEY_BIOGUIDE.format(**record)
+                if record["chamber"] == "senate":
+                    chamber_key = self.KEY_SENATE.format(**record)
+                else:
+                    chamber_key = self.KEY_HOUSE.format(**record)
 
-            direct_key = self.KEY_BIOGUIDE.format(**record)
-            if record["chamber"] == "senate":
-                chamber_key = self.KEY_SENATE.format(**record)
-            else:
-                chamber_key = self.KEY_HOUSE.format(**record)
-
-            legislators[direct_key].append(record)
-            legislators[chamber_key].append(record)
+                legislators[direct_key].append(record)
+                legislators[chamber_key].append(record)
 
         return legislators
 
