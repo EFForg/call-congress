@@ -21,6 +21,7 @@ class UnitedStatesData(object):
         mapped = {}
         mapped['name'] = '{first_name} {last_name}'.format(**data)
         mapped['number'] = data['phone']
+        mapped['title'] = data['title']
         mapped['uid'] = data['bioguide_id']
 
         return mapped
