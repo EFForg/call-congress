@@ -30,6 +30,10 @@ def locate_targets(location, campaign):
             return data.locate_targets(state=state, district=district,
                 chambers=campaign.campaign_subtype,
                 order=campaign.target_ordering)
+        elif campaign.locate_by == LOCATION_POSTAL:
+            return data.locate_targets(zipcode=location,
+                chambers=campaign.campaign_subtype,
+                order=campaign.target_ordering)
         else:
             raise NotImplementedError('campaign has unknown locate_by value: %s' % campaign.locate_by)
 

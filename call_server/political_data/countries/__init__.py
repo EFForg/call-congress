@@ -4,7 +4,3 @@ class DataProvider(object):
         """ Load all country specific data from csv files, save to cache """
         raise NotImplementedError
 
-    def locate_targets(self, location, chamber, order):
-        """ Find all targets for a location, crossing political boundaries if necessary.
-        Returns a list of target uids."""
-        raise NotImplementedError
