@@ -48,7 +48,7 @@ Installation Instructions
 -------------------
 This application should be easy to host on Heroku, with Docker, or directly on any WSGI-compatible server. Requires Python, flask, a SQL database (we recommend Postgres, but Mysql should work), Redis or Memcache, and an SMTP server.
 
-Read detailed instrustions at [INSTALLATION.md](INSTALLATION.md)
+Read detailed instructions at [INSTALLATION.md](INSTALLATION.md)
 
 
 Political Data
