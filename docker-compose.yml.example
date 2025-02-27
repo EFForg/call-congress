@@ -16,5 +16,8 @@ services:
       CALLPOWER_CONFIG: call_server.config:DevelopmentConfig # or call_server.config:ProductionConfig
       APP_HOST: 0.0.0.0
       SENTRY_DSN: # optional, for logging errors to Sentry
+      SENTRY_ENVIRONMENT: # optional, for logging errors to Sentry
+      SENTRY_TRACES_SAMPLE_RATE: # optional, for logging errors to Sentry
+      SENTRY_PROFILES_SAMPLE_RATE: # optional, for logging errors to Sentry
     ports:
       - "5000:5000"
