@@ -1,6 +1,22 @@
 import os
 import logging
 
+if os.environ.get('SENTRY_DSN'):
+    import sentry_sdk # must be loaded before Flask
+
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        environment=os.environ.get('SENTRY_ENVIRONMENT'),
+        send_default_pii=False,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for tracing.
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE')),
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=float(os.environ.get('SENTRY_PROFILES_SAMPLE_RATE')),
+    )
+
 from flask import Flask, g, request, session
 from flask.ext.assets import Bundle
 
